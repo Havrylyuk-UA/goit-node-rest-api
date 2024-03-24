@@ -6,13 +6,7 @@ import ctrlWrapper from '../decorators/ctrlWrapper.js';
 
 const getAllContacts = async (req, res) => {
   const results = await contactsService.listContacts();
-  res.json({
-    status: 'success',
-    code: 200,
-    data: {
-      contacts: results,
-    },
-  });
+  res.json(results);
 };
 
 const getOneContact = async (req, res) => {
@@ -62,10 +56,25 @@ const updateContact = async (req, res) => {
   res.json(result);
 };
 
+const updateStatusContact = async (req, res) => {
+  const { id } = req.params;
+
+  console.log(req);
+
+  const result = contactsService.updateFavoriteStatus(id, req.body);
+
+  if (!result) {
+    throw HttpError(404, 'Not found');
+  }
+
+  res.status(200).json(result);
+};
+
 export default {
   getAllContacts: ctrlWrapper(getAllContacts),
   getOneContact: ctrlWrapper(getOneContact),
   deleteContact: ctrlWrapper(deleteContact),
   createContact: ctrlWrapper(createContact),
   updateContact: ctrlWrapper(updateContact),
+  updateStatusContact: ctrlWrapper(updateStatusContact),
 };
