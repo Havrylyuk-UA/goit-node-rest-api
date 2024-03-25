@@ -22,7 +22,5 @@ export const updateContactById = async (contactId, data) => {
 
 export const updateFavoriteStatus = async (contactId, data) => {
   const status = { favorite: data };
-  return Contact.findByIdAndUpdate(contactId, data, {
-    returnDocument: 'after',
-  });
+  return Contact.findByIdAndUpdate(contactId, status);
 };
