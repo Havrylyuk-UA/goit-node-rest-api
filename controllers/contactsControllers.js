@@ -61,6 +61,7 @@ const updateStatusContact = async (req, res) => {
   const favorite = req.body.favorite;
 
   const result = await contactsService.updateFavoriteStatus(id, favorite);
+
   if (!result) {
     throw HttpError(404, 'Not found');
   }

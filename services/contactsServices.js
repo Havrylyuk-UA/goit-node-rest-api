@@ -17,10 +17,14 @@ export const addContact = async data => {
 };
 
 export const updateContactById = async (contactId, data) => {
-  return Contact.findByIdAndUpdate(contactId, data);
+  return Contact.findByIdAndUpdate(contactId, data, {
+    new: true,
+  });
 };
 
 export const updateFavoriteStatus = async (contactId, data) => {
   const status = { favorite: data };
-  return Contact.findByIdAndUpdate(contactId, status);
+  return Contact.findByIdAndUpdate(contactId, status, {
+    new: true,
+  });
 };
