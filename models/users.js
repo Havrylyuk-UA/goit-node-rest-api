@@ -1,6 +1,5 @@
-import mongoose from 'mongoose';
-
-const { Schema, model } = mongoose;
+import { Schema, model } from 'mongoose';
+import { emailRegepxp } from '../constants/user-constants.js';
 
 const userSchema = new Schema(
   {
@@ -10,6 +9,7 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
+      match: emailRegepxp,
       required: [true, 'Email is required'],
       unique: true,
     },
@@ -26,4 +26,6 @@ const userSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
-export const User = model('user', userSchema);
+const User = model('user', userSchema);
+
+export default User;

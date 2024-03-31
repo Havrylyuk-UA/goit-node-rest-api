@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import * as authServices from '../services/authServices.js';
 
 import ctrlWrapper from '../decorators/ctrlWrapper.js';
-
 import HttpError from '../helpers/HttpError.js';
 
 const { JWT_SECRET } = process.env;
@@ -12,8 +11,9 @@ const { JWT_SECRET } = process.env;
 const signup = async (req, res) => {
   const { email, password } = req.body;
   const user = await authServices.findUser({ email });
+
   if (user) {
-    throw HttpError(409, 'Email already in use');
+    throw HttpError(409, 'This email is already use');
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
@@ -29,15 +29,16 @@ const signup = async (req, res) => {
   });
 };
 
-const singin = async (req, res) => {
+const signin = async (req, res) => {
   const { email, password } = req.body;
-  const user = await authServices.findUser({ email });
+  const user = authServices.findUser({ email });
   if (!user) {
-    throw HttpError(401, 'Email or password invalid');
+    throw HttpError(401, 'Email or password is invalid');
   }
+
   const passwordCompare = await bcrypt.compare(password, user.password);
   if (!passwordCompare) {
-    throw HttpError(401, 'Email or password invalid');
+    throw HttpError(401, 'Email or password is invalid');
   }
 
   const { _id: id } = user;
@@ -47,34 +48,36 @@ const singin = async (req, res) => {
   };
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '23h' });
-  await authServices.updateUser({ _id: id }, { token });
+  const response = await authServices.updateUser({ _id: id }, { token });
 
   res.json({
     token,
+    user: response,
   });
 };
 
 const getCurrent = async (req, res) => {
-  const { username, email } = req.user;
+  const { email, subscription } = req.user;
 
   res.json({
-    username,
     email,
+    subscription,
   });
 };
 
 const signout = async (req, res) => {
-  const { _id } = req.user;
-  await authServices.updateUser({ _id }, { token: '' });
+  const { _id: id } = req.user;
 
-  res.json({
-    message: 'Signout success',
+  await authServices.updateUser({ id }, { token: '' });
+
+  res.status(204).json({
+    message: 'Singout success',
   });
 };
 
 export default {
   signup: ctrlWrapper(signup),
-  signin: ctrlWrapper(singin),
+  signin: ctrlWrapper(signin),
   getCurrent: ctrlWrapper(getCurrent),
   signout: ctrlWrapper(signout),
 };
