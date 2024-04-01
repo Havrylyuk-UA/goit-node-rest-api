@@ -1,7 +1,7 @@
 import { Contact } from '../models/contacts.js';
 
-export const listContacts = async () => {
-  return Contact.find({});
+export const listContacts = async (filter = {}) => {
+  return Contact.find(filter).populate('owner', 'email subscription');
 };
 
 export const getContactById = async contactId => {
@@ -17,8 +17,8 @@ export const addContact = async data => {
 };
 
 export const updateContactById = async (contactId, data) => {
-  return Contact.findByIdAndUpdate(contactId, data, {
-    new: true,
+  return Contact.findOneAndUpdate(contactId, data, {
+    returnDocument: 'after',
   });
 };
 

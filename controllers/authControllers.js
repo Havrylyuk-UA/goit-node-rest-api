@@ -13,7 +13,7 @@ const signup = async (req, res) => {
   const user = await authServices.findUser({ email });
 
   if (user) {
-    throw HttpError(409, 'This email is already use');
+    throw HttpError(409, 'Email in use');
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
@@ -24,14 +24,13 @@ const signup = async (req, res) => {
   });
 
   res.status(201).json({
-    username: newUser.username,
-    email: newUser.email,
+    user: newUser,
   });
 };
 
 const signin = async (req, res) => {
   const { email, password } = req.body;
-  const user = authServices.findUser({ email });
+  const user = await authServices.findUser({ email });
   if (!user) {
     throw HttpError(401, 'Email or password is invalid');
   }
@@ -66,13 +65,11 @@ const getCurrent = async (req, res) => {
 };
 
 const signout = async (req, res) => {
-  const { _id: id } = req.user;
+  const { _id } = req.user;
 
-  await authServices.updateUser({ id }, { token: '' });
+  await authServices.updateUser({ _id }, { token: '' });
 
-  res.status(204).json({
-    message: 'Singout success',
-  });
+  res.status(204).json();
 };
 
 export default {
