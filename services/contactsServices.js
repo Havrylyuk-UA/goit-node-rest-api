@@ -5,11 +5,11 @@ export const listContacts = async (filter = {}) => {
 };
 
 export const getContactById = async contactId => {
-  return Contact.findById(contactId);
+  return Contact.findOne(contactId);
 };
 
 export const removeContact = async contactId => {
-  return Contact.findByIdAndDelete(contactId);
+  return Contact.findOneAndDelete(contactId);
 };
 
 export const addContact = async data => {
@@ -24,7 +24,7 @@ export const updateContactById = async (contactId, data) => {
 
 export const updateFavoriteStatus = async (contactId, data) => {
   const status = { favorite: data };
-  return Contact.findByIdAndUpdate(contactId, status, {
+  return Contact.findOneAndUpdate(contactId, status, {
     new: true,
   });
 };
