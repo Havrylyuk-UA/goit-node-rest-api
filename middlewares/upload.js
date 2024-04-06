@@ -18,19 +18,19 @@ const limits = {
 };
 
 const fileFilter = (req, file, callback) => {
-  const extention = file.originalname.split('.').pop();
+  const extension = file.originalname.split('.').pop();
 
-  if (extention === 'exe') {
-    return callback(HttpError(400, 'exe is not allow'));
+  if (extension === 'exe') {
+    return callback(HttpError(400, 'exe is not allowed'));
   }
 
   callback(null, true);
 };
 
-const upload = {
+const upload = multer({
   storage,
   limits,
   fileFilter,
-};
+});
 
 export default upload;
