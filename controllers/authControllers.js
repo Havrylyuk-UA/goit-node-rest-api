@@ -6,9 +6,11 @@ import path from 'path';
 import gravatar from 'gravatar';
 import 'dotenv/config';
 import * as authServices from '../services/authServices.js';
+import { nanoid } from 'nanoid';
 
 import ctrlWrapper from '../decorators/ctrlWrapper.js';
 import HttpError from '../helpers/HttpError.js';
+import sendEmail from '../helpers/sendlerEmail.js';
 
 const { JWT_SECRET } = process.env;
 
@@ -26,20 +28,36 @@ const signup = async (req, res) => {
 
   const avatarURL = gravatar.url(email);
 
+  const verificationToken = nanoid();
+
   const newUser = await authServices.signup({
     ...req.body,
     password: hashPassword,
     avatarURL,
+    verificationToken,
   });
 
-  res.status(201).json({
-    user: newUser,
-  });
+  const mail = {
+    to: email,
+    subject: 'Verify email',
+    html: `<a target="_blank" href="http://localhost:3000/api/users/verify/${verificationToken}">Verify email</a>`,
+  };
+
+  try {
+    await sendEmail(mail);
+    return res.status(201).json({
+      user: newUser,
+      message: 'Verification email sent',
+    });
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
 };
 
 const signin = async (req, res) => {
   const { email, password } = req.body;
   const user = await authServices.findUser({ email });
+
   if (!user) {
     throw HttpError(401, 'Email or password is invalid');
   }
@@ -49,10 +67,17 @@ const signin = async (req, res) => {
     throw HttpError(401, 'Email or password is invalid');
   }
 
+  if (!user.verify) {
+    return res
+      .status(401)
+      .json({ message: 'Email not verified. Access denied' });
+  }
+
   const { _id: id } = user;
 
   const payload = {
     id,
+    email,
   };
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '23h' });
