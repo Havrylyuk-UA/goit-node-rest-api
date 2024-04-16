@@ -16,17 +16,9 @@ const config = {
 
 const transporter = nodemailer.createTransport(config);
 
-const sendEmail = async ({ to, subject, html }) => {
-  try {
-    await transporter.sendMail({
-      from: SEND_META_USER,
-      to,
-      subject,
-      html,
-    });
-  } catch (error) {
-    throw error;
-  }
+const sendEmail = data => {
+  const email = { ...data, from: SEND_META_USER };
+  return transporter.sendMail(email);
 };
 
 export default sendEmail;

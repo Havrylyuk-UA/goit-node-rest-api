@@ -2,6 +2,9 @@ import HttpError from '../helpers/HttpError.js';
 import sendEmail from '../helpers/sendlerEmail.js';
 import User from '../models/users.js';
 import ctrlWrapper from '../decorators/ctrlWrapper.js';
+import 'dotenv/config';
+
+const { PROJECT_URL } = process.env;
 
 const verifyEmail = async (req, res) => {
   const { verificationToken } = req.params;
@@ -24,7 +27,6 @@ const resendVerifyEmail = async (req, res) => {
   const { email } = req.body;
 
   const user = await User.findOne({ email });
-
   if (!user) {
     return HttpError(400, 'User not found');
   }
@@ -37,18 +39,15 @@ const resendVerifyEmail = async (req, res) => {
 
   const verifyEmail = {
     to: email,
-    subject: 'Verify email',
-    html: `<a target="_blank" href="http://localhost:3000/api/users/verify/${user.verificationToken}">Verify email</a>`,
+    subject: 'Please verify your email',
+    html: `<p>Hello, thank you for using our service, please confirm your email </p>
+    <a target="_blank" href="${PROJECT_URL}/api/users/verify/${user.verificationToken}">Verify email</a>`,
   };
 
-  try {
-    await sendEmail(verifyEmail);
-    return res.status(201).json({
-      message: 'Verification email sent',
-    });
-  } catch (error) {
-    return res.status(500).json(error.message);
-  }
+  await sendEmail(verifyEmail);
+  return res.status(201).json({
+    message: 'Verification email sent',
+  });
 };
 
 export default {

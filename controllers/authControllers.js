@@ -12,7 +12,7 @@ import ctrlWrapper from '../decorators/ctrlWrapper.js';
 import HttpError from '../helpers/HttpError.js';
 import sendEmail from '../helpers/sendlerEmail.js';
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, PROJECT_URL } = process.env;
 
 const avatarsPath = path.resolve('public', 'avatars');
 
@@ -40,7 +40,8 @@ const signup = async (req, res) => {
   const mail = {
     to: email,
     subject: 'Verify email',
-    html: `<a target="_blank" href="http://localhost:3000/api/users/verify/${verificationToken}">Verify email</a>`,
+    html: `<p>Hello, thank you for using our service, please confirm your email </p>
+    <a target="_blank" href="${PROJECT_URL}/api/users/verify/${verificationToken}">Verify email</a>`,
   };
 
   try {
