@@ -28,7 +28,7 @@ const resendVerifyEmail = async (req, res) => {
 
   const user = await User.findOne({ email });
   if (!user) {
-    return HttpError(400, 'User not found');
+    throw HttpError(400, 'User not found');
   }
 
   if (user.verify) {
@@ -39,7 +39,7 @@ const resendVerifyEmail = async (req, res) => {
 
   const verifyEmail = {
     to: email,
-    subject: 'Please verify your email',
+    subject: 'Verify email',
     html: `<p>Hello, thank you for using our service, please confirm your email </p>
     <a target="_blank" href="${PROJECT_URL}/api/users/verify/${user.verificationToken}">Verify email</a>`,
   };
